@@ -6,6 +6,8 @@ $AuditScript = Join-Path $RepoRoot "Invoke-SupplyChainAudit.ps1"
 Write-Host "--- Running Clean Fixture Test ---"
 $CleanRoot = Join-Path $ScriptDir "fixtures/clean"
 $CleanDesktop = Join-Path $CleanRoot "Desktop"
+if (-not (Test-Path $CleanDesktop)) { New-Item -ItemType Directory -Force -Path $CleanDesktop | Out-Null }
+
 $CleanLocalAppData = Join-Path $CleanRoot "AppData/Local"
 
 & $AuditScript -Path $CleanRoot -TestUserProfile $CleanRoot -TestLocalAppData $CleanLocalAppData
@@ -24,6 +26,8 @@ Write-Host "Clean test passed!" -ForegroundColor Green
 Write-Host "--- Running Malicious Fixture Test ---"
 $MaliciousRoot = Join-Path $ScriptDir "fixtures/malicious"
 $MaliciousDesktop = Join-Path $MaliciousRoot "Desktop"
+if (-not (Test-Path $MaliciousDesktop)) { New-Item -ItemType Directory -Force -Path $MaliciousDesktop | Out-Null }
+
 $MaliciousLocalAppData = Join-Path $MaliciousRoot "AppData/Local"
 
 & $AuditScript -Path $MaliciousRoot -TestUserProfile $MaliciousRoot -TestLocalAppData $MaliciousLocalAppData

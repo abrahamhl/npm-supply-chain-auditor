@@ -11,8 +11,10 @@ Read-only by default. Single PowerShell file. No dependencies, no install, no ne
 
 ---
 
-## Why this exists
+## What It Is
+A fast, read-only PowerShell forensics tool designed to check if a developer's machine has been compromised by the Shai-Hulud family of self-propagating npm worms. It looks for known indicators of compromise (IOCs) such as malicious files, backdoored dependencies, malicious configuration in AI tooling, and suspicious hooks.
 
+## Why This Exists
 Antivirus scans files **when they are downloaded**. It does not re-scan a package
 that was clean yesterday and got hijacked today. That gap is exactly what these
 worms live in: a legitimate, widely-trusted package is republished with a
@@ -21,6 +23,11 @@ completes — so it fires even when `npm install` fails.
 
 ChainDrop reached **452 packages across 2,251 versions**, roughly **2 billion
 monthly downloads**, in under four hours.
+
+## Threat Model & Scope
+This tool assumes the attacker is executing an automated, self-propagating script payload mimicking the behavior seen in the Shai-Hulud and ChainDrop campaigns.
+- **In-Scope**: Detecting the Bun runtime dropped by the worm, stage-2 payload files based on size/name heuristics, identifying compromised packages by comparing installed versions against an advisory list, finding editor/agent persistence (like modified VS Code or Claude configs), and finding malicious hooks.
+- **Out-of-Scope (Non-Goals)**: Detecting zero-days, preventing initial infection, removing malware comprehensively without user intervention (remediation requires opt-in and confirmation per item).
 
 ## What it detects
 
@@ -49,7 +56,7 @@ cleared matches as `INFO` rather than hiding them — so you can audit the audit
 
 Every entry above was hit during a real engagement on 2026-08-06 and cleared by hand.
 
-## Output
+## Safe Example Output
 
 Console verdict plus two files: a human-readable `.txt` and a machine-readable
 `.json` for piping into a SIEM or a CI gate.
@@ -59,6 +66,9 @@ Console verdict plus two files: a human-readable `.txt` and a machine-readable
   VERDICT: CLEAN - no evidence of ChainDrop / Shai-Hulud compromise.
   No credential rotation required on the basis of this scan.
 ========================================================================
+
+Report: C:\Users\ExampleUser\Desktop\supply-chain-audit-20260807-120000.txt
+JSON:   C:\Users\ExampleUser\Desktop\supply-chain-audit-20260807-120000.json
 ```
 
 ## Remediation
@@ -103,6 +113,15 @@ minimumReleaseAge: 3d
 pnpm then refuses any version published less than three days ago. ChainDrop's
 malicious versions were live for under four hours — this setting alone would have
 blocked the entire campaign, and the two before it.
+
+## Testing and Verification
+The repository includes automated testing using GitHub Actions. It validates the scanner logic against synthetic clean and malicious fixtures ensuring the absence of false negatives and false positives.
+
+## Authorship / Attribution
+Authored by Abraham Haddioui. All scripts are original and written to solve real-world problems observed in the wild.
+
+## Limitations
+This is a forensic scanner for a specific family of threats. It is not an antivirus, EDR, or a general-purpose security tool.
 
 ## References
 

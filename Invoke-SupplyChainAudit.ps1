@@ -54,12 +54,25 @@
 #>
 
 [CmdletBinding()]
-param(
+param (
     [string[]] $Path,
     [switch]   $Remediate,
     [string]   $OutputDir = "$env:USERPROFILE\Desktop",
-    [switch]   $IncludeCloudMounts
+    [switch]   $IncludeCloudMounts,
+    # TEST HOOKS: Do not use in production
+    [string]   $TestUserProfile,
+    [string]   $TestLocalAppData
 )
+
+# Setup environment overrides
+$resolvedUserProfile = if ($TestUserProfile) { $TestUserProfile } else { $env:USERPROFILE }
+$resolvedLocalAppData = if ($TestLocalAppData) { $TestLocalAppData } else { $env:LOCALAPPDATA }
+
+# Overwrite output dir if test user profile is provided and outputdir hasn't been changed explicitly
+if ($TestUserProfile -and $OutputDir -eq "$env:USERPROFILE\Desktop") {
+    $OutputDir = Join-Path $TestUserProfile "Desktop"
+}
+
 
 $ErrorActionPreference = 'SilentlyContinue'
 $script:Findings = New-Object System.Collections.Generic.List[object]
@@ -144,7 +157,7 @@ function Test-Benign {
 function Get-ScanRoots {
     if ($Path) { return $Path | Where-Object { Test-Path -LiteralPath $_ } }
     $candidates = @(
-        $env:USERPROFILE, 'C:\dev', 'C:\Abraham_OS', 'C:\projects', 'C:\src', 'C:\repos'
+        $resolvedUserProfile, 'C:\dev', 'C:\Abraham_OS', 'C:\projects', 'C:\src', 'C:\repos'
     )
     $roots = $candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -Unique
     if (-not $IncludeCloudMounts) {
@@ -174,11 +187,11 @@ Write-Host ""
 # The single highest-signal check. No Bun == the payload never executed.
 Write-Host "[1/6] Bun runtime (the worm's execution prerequisite)" -ForegroundColor White
 $bunFound = $false
-if (Get-Command bun -ErrorAction SilentlyContinue) {
+if ((-not $TestUserProfile) -and (Get-Command bun -ErrorAction SilentlyContinue)) {
     $bunFound = $true
     Add-Finding CRITICAL 'Bun' "Bun is on PATH: $((Get-Command bun).Source)" (Get-Command bun).Source
 }
-foreach ($bp in @("$env:USERPROFILE\.bun", "$env:LOCALAPPDATA\bun")) {
+foreach ($bp in @("$resolvedUserProfile\.bun", "$resolvedLocalAppData\bun")) {
     if (Test-Path -LiteralPath $bp) { $bunFound = $true; Add-Finding CRITICAL 'Bun' "Bun install dir present: $bp" $bp -Removable }
 }
 $staging = Get-ChildItem -LiteralPath $env:TEMP -Force | Where-Object { $_.Name -like 'bun-dl-*' -or $_.Name -like 'tmp.dpkg_*' }
@@ -258,7 +271,7 @@ foreach ($root in $roots) {
         }
       }
 }
-foreach ($cfg in @("$env:USERPROFILE\.claude\settings.json", "$env:USERPROFILE\.claude\settings.local.json")) {
+foreach ($cfg in @("$resolvedUserProfile\.claude\settings.json", "$resolvedUserProfile\.claude\settings.local.json")) {
     if (-not (Test-Path -LiteralPath $cfg)) { continue }
     $raw = Get-Content -LiteralPath $cfg -Raw
     if ($raw -match 'setup\.mjs|bun_environment|setup_bun') {
@@ -292,7 +305,7 @@ if ($hookHits -eq 0) { Add-Finding CLEAR 'Hook' 'No install hooks matching worm 
 
 # --- CHECK 6: npm history -------------------------------------------------
 Write-Host "[6/6] npm log history (exfil domains, malicious versions)" -ForegroundColor White
-$logDir = "$env:LOCALAPPDATA\npm-cache\_logs"
+$logDir = "$resolvedLocalAppData\npm-cache\_logs"
 if (Test-Path -LiteralPath $logDir) {
     $pattern = ($IOC_Network + ($IOC_Packages | ForEach-Object { "$([regex]::Escape($_.Name))@$([regex]::Escape($_.Bad))" })) -join '|'
     $hits = Select-String -Path "$logDir\*.log" -Pattern $pattern -ErrorAction SilentlyContinue

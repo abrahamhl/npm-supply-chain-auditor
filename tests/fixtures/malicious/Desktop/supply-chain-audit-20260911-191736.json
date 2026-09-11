@@ -1,0 +1,79 @@
+[
+  {
+    "timestamp": "2026-09-11T19:17:36Z",
+    "scanner_version": "1.1.0",
+    "severity": "CRITICAL",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Bun",
+    "evidence": "C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\.bun",
+    "detail": "Bun install dir present: C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\.bun",
+    "remediation_recommendation": "Remove file at C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\.bun"
+  },
+  {
+    "timestamp": "2026-09-11T19:17:36Z",
+    "scanner_version": "1.1.0",
+    "severity": "CRITICAL",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Payload",
+    "evidence": "C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\dev\\project\\setup.mjs",
+    "detail": "ChainDrop payload: C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\dev\\project\\setup.mjs",
+    "remediation_recommendation": "Remove file at C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\dev\\project\\setup.mjs"
+  },
+  {
+    "timestamp": "2026-09-11T19:17:36Z",
+    "scanner_version": "1.1.0",
+    "severity": "CRITICAL",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Package",
+    "evidence": "C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\dev\\project\\node_modules\\keyv",
+    "detail": "COMPROMISED keyv@6.0.0 - downgrade to 5.6.0: C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\dev\\project\\node_modules\\keyv",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:17:36Z",
+    "scanner_version": "1.1.0",
+    "severity": "CRITICAL",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Persistence",
+    "evidence": "C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\.claude\\settings.json",
+    "detail": "Agent hook references a dropper: C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\.claude\\settings.json",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:17:36Z",
+    "scanner_version": "1.1.0",
+    "severity": "CRITICAL",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Hook",
+    "evidence": "C:\\Users\\2fabr\\portfolio-work\\npm-supply-chain-auditor\\tests\\fixtures\\malicious\\dev\\project\\node_modules\\bad-pkg\\package.json",
+    "detail": "Suspicious preinstall in bad-pkg: node setup.mjs",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:17:36Z",
+    "scanner_version": "1.1.0",
+    "severity": "CRITICAL",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "History",
+    "evidence": "",
+    "detail": "npm log hit in 2026-08-01T00_00_00_000Z-debug-0.log:1: fetch http://npm-cache.com/payload",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:17:36Z",
+    "scanner_version": "1.1.0",
+    "severity": "INFO",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "History",
+    "evidence": "",
+    "detail": "Most recent npm invocation: 09/11/2026 19:13:50",
+    "remediation_recommendation": "Manual review required"
+  }
+]

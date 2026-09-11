@@ -1,0 +1,21 @@
+npm SUPPLY-CHAIN AUDIT - 09/11/2026 19:32:18
+Host: VICTUSSY   User: 2fabr
+Roots: C:\Users\2fabr\portfolio-work\npm-supply-chain-auditor\tests\fixtures\malicious
+Verdict: 6 CRITICAL
+
+
+severity matched_rule detail
+-------- ------------ ------
+CRITICAL Bun          Bun install dir present:
+                      C:\Users\2fabr\portfolio-work\npm-supply-chain-auditor\tests\fixtures\malicious\.bun
+CRITICAL Payload      ChainDrop payload: C:\Users\2fabr\portfolio-work\npm-supply-chain-auditor\tests\fixtures\malicious
+                      \dev\project\setup.mjs
+CRITICAL Package      COMPROMISED keyv@6.0.0 - downgrade to 5.6.0: C:\Users\2fabr\portfolio-work\npm-supply-chain-audito
+                      r\tests\fixtures\malicious\dev\project\node_modules\keyv
+CRITICAL Persistence  Agent hook references a dropper: C:\Users\2fabr\portfolio-work\npm-supply-chain-auditor\tests\fixt
+                      ures\malicious\.claude\settings.json
+CRITICAL Hook         Suspicious preinstall in bad-pkg: node setup.mjs
+CRITICAL History      npm log hit in 2026-08-01T00_00_00_000Z-debug-0.log:1: fetch http://npm-cache.com/payload
+INFO     History      Most recent npm invocation: 09/11/2026 19:13:50
+
+

@@ -82,65 +82,49 @@ $script:Findings = New-Object System.Collections.Generic.List[object]
 # Keeping the intel as data (not code) is what makes this reusable.
 # ---------------------------------------------------------------------------
 
-# Payload filenames. ExpectedSize (bytes) disambiguates name collisions with
-# legitimate packages; $null means "any size is suspicious".
-$IOC_Files = @(
-    @{ Name = 'setup_bun.js';       Campaign = 'Shai-Hulud 2.0'; Size = $null   }
-    @{ Name = 'bun_environment.js'; Campaign = 'Shai-Hulud 2.0'; Size = $null   }
-    @{ Name = 'setup.mjs';          Campaign = 'ChainDrop';      Size = $null   }
-    @{ Name = 'Math_Symbol.js';     Campaign = 'ChainDrop';      Size = 727680  }
-    @{ Name = 'math_init.js';       Campaign = 'ChainDrop';      Size = 727680  }
-    @{ Name = 'truffleSecrets.json';   Campaign = 'Shai-Hulud';  Size = $null   }
-    @{ Name = 'actionsSecrets.json';   Campaign = 'Shai-Hulud';  Size = $null   }
-    @{ Name = 'gh-token-monitor.sh';   Campaign = 'ChainDrop';   Size = $null   }
-)
+$iocPath = Join-Path $PSScriptRoot "ioc_dataset.json"
+if (-not (Test-Path $iocPath)) {
+    Write-Error "CRITICAL: ioc_dataset.json not found at $iocPath. Cannot run audit."
+    exit 1
+}
+$iocData = Get-Content $iocPath -Raw | ConvertFrom-Json
 
-# Directories dropped by the credential harvester.
-$IOC_Dirs = @('.truffler-cache', 'gh-token-monitor')
+$IOC_Files = @()
+foreach ($f in $iocData.files) {
+    $IOC_Files += @{ Name = $f.name; Campaign = $f.campaign; Size = $f.expected_size }
+}
 
-# KNOWN-BENIGN PATH PATTERNS.
-# Every one of these was hit during a real audit on 2026-08-06 and manually
-# cleared. Without this list the scanner cries wolf and gets ignored - which is
-# how real detections get missed.
-$Benign = @(
-    '\\node_modules\\motion-dom\\',                      # framer-motion gesture helper
-    '\\node_modules\\regenerate-unicode-properties\\',   # Unicode category data files
-    '\\anaconda3\\pkgs\\',                               # Xcode asset catalogs in test fixtures
-    '\\.xcassets\\'
-)
+$IOC_Dirs = $iocData.directories
+$Benign = $iocData.benign_patterns
 
-# Compromised package@version pairs. Add rows as advisories are published.
-$IOC_Packages = @(
-    @{ Name = 'keyv';                    Bad = '6.0.0';    Safe = '5.6.0'  }
-    @{ Name = 'flat-cache';              Bad = '6.1.24';   Safe = '6.1.23' }
-    @{ Name = 'file-entry-cache';        Bad = '11.1.6';   Safe = '11.1.5' }
-    @{ Name = 'cacheable';               Bad = '2.5.1';    Safe = '2.5.0'  }
-    @{ Name = 'cacheable-request';       Bad = '13.0.20';  Safe = '13.0.19'}
-    @{ Name = 'cache-manager';           Bad = '7.2.10';   Safe = '7.2.9'  }
-    @{ Name = 'ecto';                    Bad = '5.0.1';    Safe = '5.0.0'  }
-    @{ Name = '@cacheable/utils';        Bad = '2.5.1';    Safe = '2.5.0'  }
-    @{ Name = '@cacheable/memory';       Bad = '2.2.1';    Safe = '2.2.0'  }
-    @{ Name = '@cacheable/node-cache';   Bad = '3.1.2';    Safe = '3.1.1'  }
-    @{ Name = '@cacheable/net';          Bad = '2.1.1';    Safe = '2.1.0'  }
-)
+$IOC_Packages = @()
+foreach ($p in $iocData.compromised_packages) {
+    $IOC_Packages += @{ Name = $p.name; Bad = $p.bad_version; Safe = $p.safe_version }
+}
 
-# Exfiltration endpoints and payload markers, grepped from npm logs.
-$IOC_Network = @(
-    'npm-cache\.com'
-    'thebeautifulmarchoftime'
-    '0xE1f2395ee43e45A1556EC6438a88c31B83493103'
-)
+$IOC_Network = $iocData.network_indicators
 
 # ---------------------------------------------------------------------------
+
+$SCANNER_VERSION = "1.1.0"
 
 function Add-Finding {
     param(
         [ValidateSet('CRITICAL','WARNING','INFO','CLEAR')] [string]$Severity,
-        [string]$Check, [string]$Detail, [string]$Target = '', [switch]$Removable
+        [string]$Check, [string]$Detail, [string]$Target = '', [switch]$Removable,
+        [string]$Confidence = 'High', [string]$MatchedRule = '', [string]$Remediation = ''
     )
     $script:Findings.Add([pscustomobject]@{
-        Severity = $Severity; Check = $Check; Detail = $Detail
-        Target = $Target; Removable = [bool]$Removable
+        timestamp = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+        scanner_version = $SCANNER_VERSION
+        severity = $Severity
+        confidence = $Confidence
+        source = 'Invoke-SupplyChainAudit'
+        matched_rule = if ($MatchedRule) { $MatchedRule } else { $Check }
+        evidence = $Target
+        detail = $Detail
+        remediation_recommendation = if ($Remediation) { $Remediation } elseif ($Removable) { "Remove file at $Target" } else { "Manual review required" }
+        _removable = [bool]$Removable
     })
     $colour = switch ($Severity) {
         'CRITICAL' { 'Red' }; 'WARNING' { 'Yellow' }; 'CLEAR' { 'Green' }; default { 'Gray' }
@@ -353,9 +337,9 @@ $header = @(
     "Verdict: $(if ($crit.Count -eq 0) { 'CLEAN' } else { "$($crit.Count) CRITICAL" })"
     ''
 )
-$header + ($script:Findings | Format-Table Severity, Check, Detail -AutoSize -Wrap | Out-String) |
+$header + ($script:Findings | Format-Table severity, matched_rule, detail -AutoSize -Wrap | Out-String) |
     Out-File -FilePath $txt -Encoding UTF8
-$script:Findings | ConvertTo-Json -Depth 4 | Out-File -FilePath $json -Encoding UTF8
+$script:Findings | Select-Object * -ExcludeProperty _removable | ConvertTo-Json -Depth 4 | Out-File -FilePath $json -Encoding UTF8
 
 Write-Host ""
 Write-Host "Report: $txt"  -ForegroundColor Cyan
@@ -363,7 +347,7 @@ Write-Host "JSON:   $json" -ForegroundColor Cyan
 
 # --- remediation (opt-in, per-item confirmation) --------------------------
 if ($Remediate) {
-    $removable = @($script:Findings | Where-Object { $_.Severity -eq 'CRITICAL' -and $_.Removable -and $_.Target })
+    $removable = @($script:Findings | Where-Object { $_.severity -eq 'CRITICAL' -and $_._removable -and $_.evidence })
     if ($removable.Count -eq 0) {
         Write-Host ""
         Write-Host "Nothing safely auto-removable. Remaining findings need manual review." -ForegroundColor Yellow
@@ -372,11 +356,11 @@ if ($Remediate) {
         Write-Host "REMEDIATION - each item asks separately. Ctrl+C aborts." -ForegroundColor Red
         foreach ($r in $removable) {
             Write-Host ""
-            Write-Host "  Target: $($r.Target)" -ForegroundColor White
+            Write-Host "  Target: $($r.evidence)" -ForegroundColor White
             $a = Read-Host "  Delete this? (yes/NO)"
             if ($a -eq 'yes') {
-                Remove-Item -LiteralPath $r.Target -Recurse -Force -Confirm:$false
-                if (Test-Path -LiteralPath $r.Target) { Write-Host "  FAILED - still present." -ForegroundColor Red }
+                Remove-Item -LiteralPath $r.evidence -Recurse -Force -Confirm:$false
+                if (Test-Path -LiteralPath $r.evidence) { Write-Host "  FAILED - still present." -ForegroundColor Red }
                 else { Write-Host "  Removed." -ForegroundColor Green }
             } else { Write-Host "  Skipped." -ForegroundColor DarkGray }
         }

@@ -1,0 +1,17 @@
+npm SUPPLY-CHAIN AUDIT - 09/11/2026 19:32:17
+Host: VICTUSSY   User: 2fabr
+Roots: C:\Users\2fabr\portfolio-work\npm-supply-chain-auditor\tests\fixtures\clean
+Verdict: CLEAN
+
+
+severity matched_rule detail
+-------- ------------ ------
+CLEAR    Bun          Bun absent - the worm payload could not have executed on this host.
+CLEAR    Payload      No worm payload files found.
+CLEAR    Package      No compromised package versions installed.
+CLEAR    Persistence  No dropper persistence in .claude/.vscode configs.
+CLEAR    Hook         No install hooks matching worm patterns.
+CLEAR    History      No exfil domains or malicious versions in npm history.
+INFO     History      Most recent npm invocation: 09/11/2026 19:13:50
+
+

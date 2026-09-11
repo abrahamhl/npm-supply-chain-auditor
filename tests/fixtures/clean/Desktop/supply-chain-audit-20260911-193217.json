@@ -1,0 +1,79 @@
+[
+  {
+    "timestamp": "2026-09-11T19:32:17Z",
+    "scanner_version": "1.1.0",
+    "severity": "CLEAR",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Bun",
+    "evidence": "",
+    "detail": "Bun absent - the worm payload could not have executed on this host.",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:32:17Z",
+    "scanner_version": "1.1.0",
+    "severity": "CLEAR",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Payload",
+    "evidence": "",
+    "detail": "No worm payload files found.",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:32:17Z",
+    "scanner_version": "1.1.0",
+    "severity": "CLEAR",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Package",
+    "evidence": "",
+    "detail": "No compromised package versions installed.",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:32:17Z",
+    "scanner_version": "1.1.0",
+    "severity": "CLEAR",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Persistence",
+    "evidence": "",
+    "detail": "No dropper persistence in .claude/.vscode configs.",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:32:17Z",
+    "scanner_version": "1.1.0",
+    "severity": "CLEAR",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "Hook",
+    "evidence": "",
+    "detail": "No install hooks matching worm patterns.",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:32:17Z",
+    "scanner_version": "1.1.0",
+    "severity": "CLEAR",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "History",
+    "evidence": "",
+    "detail": "No exfil domains or malicious versions in npm history.",
+    "remediation_recommendation": "Manual review required"
+  },
+  {
+    "timestamp": "2026-09-11T19:32:17Z",
+    "scanner_version": "1.1.0",
+    "severity": "INFO",
+    "confidence": "High",
+    "source": "Invoke-SupplyChainAudit",
+    "matched_rule": "History",
+    "evidence": "",
+    "detail": "Most recent npm invocation: 09/11/2026 19:13:50",
+    "remediation_recommendation": "Manual review required"
+  }
+]

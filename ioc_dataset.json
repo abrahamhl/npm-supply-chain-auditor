@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-09-11",
+  "files": [
+    { "name": "setup_bun.js", "campaign": "Shai-Hulud 2.0", "expected_size": null },
+    { "name": "bun_environment.js", "campaign": "Shai-Hulud 2.0", "expected_size": null },
+    { "name": "setup.mjs", "campaign": "ChainDrop", "expected_size": null },
+    { "name": "Math_Symbol.js", "campaign": "ChainDrop", "expected_size": 727680 },
+    { "name": "math_init.js", "campaign": "ChainDrop", "expected_size": 727680 },
+    { "name": "truffleSecrets.json", "campaign": "Shai-Hulud", "expected_size": null },
+    { "name": "actionsSecrets.json", "campaign": "Shai-Hulud", "expected_size": null },
+    { "name": "gh-token-monitor.sh", "campaign": "ChainDrop", "expected_size": null }
+  ],
+  "directories": [
+    ".truffler-cache",
+    "gh-token-monitor"
+  ],
+  "benign_patterns": [
+    "\\\\node_modules\\\\motion-dom\\\\",
+    "\\\\node_modules\\\\regenerate-unicode-properties\\\\",
+    "\\\\anaconda3\\\\pkgs\\\\",
+    "\\\\.xcassets\\\\"
+  ],
+  "compromised_packages": [
+    { "name": "keyv", "bad_version": "6.0.0", "safe_version": "5.6.0" },
+    { "name": "flat-cache", "bad_version": "6.1.24", "safe_version": "6.1.23" },
+    { "name": "file-entry-cache", "bad_version": "11.1.6", "safe_version": "11.1.5" },
+    { "name": "cacheable", "bad_version": "2.5.1", "safe_version": "2.5.0" },
+    { "name": "cacheable-request", "bad_version": "13.0.20", "safe_version": "13.0.19" },
+    { "name": "cache-manager", "bad_version": "7.2.10", "safe_version": "7.2.9" },
+    { "name": "ecto", "bad_version": "5.0.1", "safe_version": "5.0.0" },
+    { "name": "@cacheable/utils", "bad_version": "2.5.1", "safe_version": "2.5.0" },
+    { "name": "@cacheable/memory", "bad_version": "2.2.1", "safe_version": "2.2.0" },
+    { "name": "@cacheable/node-cache", "bad_version": "3.1.2", "safe_version": "3.1.1" },
+    { "name": "@cacheable/net", "bad_version": "2.1.1", "safe_version": "2.1.0" }
+  ],
+  "network_indicators": [
+    "npm-cache\\.com",
+    "thebeautifulmarchoftime",
+    "0xE1f2395ee43e45A1556EC6438a88c31B83493103"
+  ]
+}

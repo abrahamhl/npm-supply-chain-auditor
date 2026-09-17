@@ -1,8 +1,8 @@
-# Recruiter Evidence
+# Evidence
 
-This document maps the claims made in the project to exact code and test evidence. It is intended for technical recruiters and hiring managers evaluating Abraham Haddioui.
+This document maps the claims made in the project to exact code and test evidence.
 
-| Claim | Exact Code/Test Evidence | What it Proves | Target Role | Limitation |
+| Claim | Exact Code/Test Evidence | What it Proves | Area | Limitation |
 |---|---|---|---|---|
 | **Incident Response Automation** | `Invoke-SupplyChainAudit.ps1` logic (IOC extraction, cross-referencing dependencies, hooks, and npm logs). | Understanding of how to script targeted forensic evidence gathering quickly. | Supply-chain security, DevTools | It relies on known IOCs; it is not zero-day detection. |
 | **Safe Execution & Opt-in Remediation** | `-Remediate` switch with `Read-Host` confirmation and `Test-Path` checks before any deletion. | Commitment to safety when operating on developer machines; preventing accidental data loss. | Developer productivity, DevTools | Automation of remediation is deliberately constrained. |
